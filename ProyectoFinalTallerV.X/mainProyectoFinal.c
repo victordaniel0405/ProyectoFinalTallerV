@@ -9,27 +9,18 @@
 #include <stdbool.h>
 #include "HAL.h"
 #include "ConfigurationBits.h"
+#include "ModuloMux.h"
 #include "ModuloTMR0.h"
 #include "ModuloADC.h"
 
-void muxSelect(int input);
 short sensorsData[5];
 char iSensor;
 
 void main(void) {
 
-    // Selectores para el Mux 8 - 1
-    TRISCbits.RC3 = 0;
-    TRISCbits.RC4 = 0;
-    TRISCbits.RC5 = 0;
-
-    // Se inician los selectores en el primer canal
-    MuxA = 0;
-    MuxB = 0;
-    MuxC = 0;
-
     iSensor = 0; // Se inicia el valor del indice del vector sensorsData en 0
-
+    
+    configuracionMux();
     configuracionTMR0();
     configuracionADC();
 
@@ -40,7 +31,7 @@ void main(void) {
     while (1) {
         NOP();
         if (on0) {
-            muxSelect(iSensor); // Se selecciona el canal
+            muxSelect(iSensor);             // Se selecciona el canal
             iniciarConversion();            // Se realiza la conversión
             
             on0 = false; 
@@ -54,38 +45,6 @@ void main(void) {
 
     }
     return;
-}
-
-void muxSelect(int input) {
-    switch (input) {
-        case 0:
-            MuxA = 0;
-            MuxB = 0;
-            MuxC = 0;
-            break;
-        case 1:
-            MuxA = 1;
-            MuxB = 0;
-            MuxC = 0;
-            break;
-        case 2:
-            MuxA = 0;
-            MuxB = 1;
-            MuxC = 0;
-            break;
-        case 3:
-            MuxA = 1;
-            MuxB = 1;
-            MuxC = 0;
-            break;
-        case 4:
-            MuxA = 0;
-            MuxB = 0;
-            MuxC = 1;
-            break;
-        default:
-            break;
-    }
 }
 
 void interrupt low_priority ISR_bajaPrioridad(void) {

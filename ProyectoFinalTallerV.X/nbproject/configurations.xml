@@ -8,6 +8,7 @@
       <itemPath>HAL.h</itemPath>
       <itemPath>ModuloTMR0.h</itemPath>
       <itemPath>ModuloADC.h</itemPath>
+      <itemPath>ModuloMux.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -19,6 +20,7 @@
       <itemPath>mainProyectoFinal.c</itemPath>
       <itemPath>ModuloTMR0.c</itemPath>
       <itemPath>ModuloADC.c</itemPath>
+      <itemPath>ModuloMux.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
