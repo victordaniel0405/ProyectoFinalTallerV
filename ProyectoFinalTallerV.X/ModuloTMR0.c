@@ -11,27 +11,29 @@
 #include "HAL.h"
 #include "ModuloTMR0.h"
 
+extern char iSensor;
+
 void configuracionTMR0(void) {
     // Configuracion TMR0
-    on0 = false;            // Variable para el TMR0
-    
-    T0CONbits.T08BIT = 0;   // Se configura el TMR0 de 16 bits
-    T0CONbits.T0CS = 0;     // Se asigna la señal principal : Fcy
-    T0CONbits.PSA = 0;      // Se asigna el preescaler del TMRO
-    T0CONbits.T0PS = 6;     // Se establece el preescaler en 1:128
+    on0 = false; // Variable para el TMR0
 
-    INTCONbits.TMR0IF = 0;  // Se baja la bandera del TMR0
+    T0CONbits.T08BIT = 1; // Se configura el TMR0 de 8 bits
+    T0CONbits.T0CS = 0;  // Se asigna la señal principal : Fcy
+    T0CONbits.PSA = 0;   // Se asigna el preescaler del TMRO
+    T0CONbits.T0PS = 6;  // Se establece el preescaler en 1:128
+
+    INTCONbits.TMR0IF = 0; // Se baja la bandera del TMR0
     INTCON2bits.TMR0IP = 1; // Prioridad alta para el TMR0
-    INTCONbits.TMR0IE = 1;  // Se activa la interrucion debida al overflow del TMRO  
+    INTCONbits.TMR0IE = 1; // Se activa la interrucion debida al overflow del TMRO  
 
-    TMR0 = 26473;           // Semilla para 1 segundo
+    TMR0 = 252; // Semilla para  0.1 milisegundos
 }
 
 void isrTMR0(void) {
     if (INTCONbits.TMR0IE && INTCONbits.TMR0IF) {
         INTCONbits.TMR0IF = 0;
-        TMR0 = 26473;
         on0 = true;
+        TMR0 = 252;
         return;
     }
 }
@@ -40,7 +42,7 @@ void isrTMR0(void) {
 void encendidoTMR0(void) {
 
 }
-*/
+ */
 
 /*
 void iniciarLedEstado(void) {
