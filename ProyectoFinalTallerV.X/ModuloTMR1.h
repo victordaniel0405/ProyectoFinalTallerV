@@ -12,8 +12,10 @@
 #include <stdbool.h>
 
 volatile bool on1;
+int contadorLED;
 
 void configuracionTMR1(void);
+void tareaTMR1(void);
 void isrTMR1(void);
 
 
