@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <pic18f252.h>
 #include "HAL.h"
 #include "ConfigurationBits.h"
 #include "ModuloMux.h"
@@ -22,42 +23,35 @@ char bufferTransmision[64];
 
 short sensorsData[5];
 char iSensor;
+char tiempoAlto;
 
 void main(void) {
 
-    // Configuramos el pin RC2 como un "pwm" controlado por TMR1
-    TRISCbits.RC2 = 0;  // Se configura el pin como salida
-    LATCbits.LC2 = 1;   // Se inicia el pin apagado
+    tiempoAlto = 5;
     
     iSensor = 0; // Se inicia el valor del indice del vector sensorsData en 0
-    
+
     configuracionMux();
     configuracionTMR0();
     configuracionTMR1();
     configuracionADC();
-    configuracionPuertoSerial();    // Solo se encuentra activa la transmisión
+    configuracionPuertoSerial(); // Solo se encuentra activa la transmisión
 
     RCONbits.IPEN = 1; // Activamos el modelo de Prioridades en las interrupciones
     INTCONbits.PEIE = 1; // Activamos las interrupciones generadas por los perifericos
     INTCONbits.GIE = 1; // Activamos las interrupciones
 
     while (1) {
-        NOP();
-        if (on0) {
-            muxSelect(iSensor);             // Se selecciona el canal
-            iniciarConversion();            // Se realiza la conversión
-            
-            on0 = false; 
-        }
-        if (tareaADC){
-            sprintf(bufferTransmision,"Dato Sensor #%u = %u \r\n",iSensor+1,adcValue);
-            //sendStringChar(bufferTransmision);
-            sensorsData[iSensor] = adcValue;            // Se guarda el valor en el vector
-            iSensor = (iSensor < 4) ? iSensor + 1 : 0;  // Se aumenta el contador
-            
+        tareaTMR0(); // PWM
+        tareaTMR1(); // Conversion ADC cada 0.1segundo y led de estado cada segundo
+        if (tareaADC) {
+            sprintf(bufferTransmision, "Dato Sensor #%u = %u \r\n", iSensor + 1, adcValue);
+            sendStringChar(bufferTransmision);
+            sensorsData[iSensor] = adcValue; // Se guarda el valor en el vector
+            iSensor = (iSensor < 4) ? iSensor + 1 : 0; // Se aumenta el contador
+            tiempoAlto = (adcValue / 60) + 5;   // Se escoge el rango dependiendo del valor del sensor
             tareaADC = false;
         }
-
     }
     return;
 }
@@ -65,12 +59,11 @@ void main(void) {
 void interrupt low_priority ISR_bajaPrioridad(void) {
     /* Aca van TODO el manejo de las intr de baja prioridad */
 
-
 }
 
 void interrupt high_priority ISR_altaPrioridad(void) {
     /* Aca van TODO el manejo de las intr de alta prioridad */
+    isrTMR0();
     isrTMR1();
     isrADC();
-    isrTMR0();
 }
