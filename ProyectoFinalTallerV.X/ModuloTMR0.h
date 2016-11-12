@@ -12,9 +12,10 @@
 #include <stdbool.h>
 
 volatile bool on0;
+int contadorPWM;
 
 void configuracionTMR0(void);
-void encendidoTMR0(void);
+void tareaTMR0(void);
 void isrTMR0(void);
 
 
